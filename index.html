@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Basic Horizontal Chart</title>
+    <title>Pie Chart</title>
     <link rel="stylesheet" href="chart.css">
     <style>
         body {
@@ -24,17 +24,21 @@
                 margin-right: auto;
             }
         }
+
+        canvas {
+            max-width: 100%;
+        }
     </style>
 </head>
 
 <body>
 
-
     <div class="container">
-        <div class="horizontal-bar-chart" id="myChart"></div>
+        <canvas id="myPieChart"></canvas>
     </div>
 
-    <script src="chart.js"></script>
+    <!-- Include Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         const myLabels = [
             {
@@ -67,7 +71,7 @@
         const myCategories = [
             {
                 name: "Mauris",
-                color: "#3C58EF",
+                color: "#8A9AF5",
             },
             {
                 name: "Aenean",
@@ -75,11 +79,51 @@
             },
             {
                 name: "Suspendisse",
-                color: "#24252A",
+                color: "#24252F",
             },
         ];
-        horizontalBarChart("myChart", myLabels, myCategories);
 
+        // Prepare the data for Chart.js
+        const data = {
+            labels: myLabels.map(label => label.name),
+            datasets: [{
+                data: myLabels.map(label => label.percent),
+                backgroundColor: myLabels.map(label => {
+                    // Find category color for each label
+                    const category = myCategories.find(cat => cat.name === label.category);
+                    return category ? category.color : '#000000';
+                }),
+                borderColor: '#ffffff',
+                borderWidth: 2,
+            }]
+        };
+
+        const config = {
+            type: 'pie',
+            data: data,
+            options: {
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw;
+                                return `${label}: ${value}%`;
+                            }
+                        }
+                    }
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+            }
+        };
+
+        // Create the pie chart
+        const ctx = document.getElementById('myPieChart').getContext('2d');
+        new Chart(ctx, config);
     </script>
 </body>
 
